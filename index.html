@@ -5,17 +5,17 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Metrostav – Report FB kampaní</title>
   <meta name="description" content="Online report Meta Ads kampaní – filtrování dle divizí." />
+
   <style>
     :root{
       --bg:#0b1220; --panel:rgba(255,255,255,.06); --panel2:rgba(255,255,255,.09);
       --border:rgba(255,255,255,.12); --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.65); --shadow:0 18px 50px rgba(0,0,0,.45);
-      --r:18px; --r2:14px; --pad:18px; --accent:#7c5cff; --accent2:#2dd4bf;
-      --danger:#ff4d6d;
+      --r:18px; --pad:18px; --accent:#7c5cff;
     }
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--text);
       background:
         radial-gradient(1200px 600px at 10% -10%, rgba(124,92,255,.25), transparent 60%),
@@ -23,395 +23,193 @@
         var(--bg);
     }
     .wrap{max-width:1180px;margin:0 auto;padding:24px}
-    header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
-    .hgroup h1{margin:0;font-size:20px;letter-spacing:.2px}
-    .hgroup p{margin:6px 0 0;color:var(--muted);font-size:13px;max-width:820px}
-    .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    header{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+    .hgroup h1{margin:0;font-size:20px}
+    .hgroup p{margin:6px 0 0;color:var(--muted);font-size:13px}
 
-    /* ✅ Období vždy doprava */
-    .period-pill{ margin-left:auto; }
+    .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .period-pill{margin-left:auto}
 
     .pill{
-      border:1px solid var(--border); background:var(--panel); color:var(--text);
-      border-radius:999px; padding:8px 10px; font-size:13px;
-      display:flex; gap:8px; align-items:center;
+      border:1px solid var(--border);background:var(--panel);
+      border-radius:999px;padding:8px 10px;font-size:13px;
+      display:flex;gap:6px;align-items:center
     }
-    select, input{
-      background:transparent;color:var(--text);border:none;outline:none;font-size:13px;
+    select,input{
+      background:transparent;border:none;color:var(--text);outline:none;font-size:13px
     }
-    input::placeholder{color:rgba(255,255,255,.45)}
     .btn{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.05);
-      color:var(--text);
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:13px;
-      cursor:pointer;
+      border:1px solid var(--border);background:rgba(255,255,255,.05);
+      color:var(--text);border-radius:999px;padding:8px 12px;font-size:13px;
+      cursor:pointer
     }
-    .btn:hover{background:rgba(255,255,255,.08)}
-    .card{
-      background:linear-gradient(180deg, var(--panel2), var(--panel));
-      border:1px solid var(--border); border-radius:var(--r);
-      box-shadow:var(--shadow);
-    }
+
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
     .tab{
-      border:1px solid var(--border);
-      background:rgba(255,255,255,.04);
-      color:var(--text);
-      border-radius:999px;
-      padding:9px 12px;
-      font-size:13px;
-      cursor:pointer;
-      user-select:none;
+      border:1px solid var(--border);background:rgba(255,255,255,.04);
+      border-radius:999px;padding:9px 12px;font-size:13px;cursor:pointer
     }
-    .tab.active{
-      background:rgba(124,92,255,.22);
-      border-color:rgba(124,92,255,.45);
-      box-shadow:0 10px 26px rgba(124,92,255,.18);
-    }
-    .grid{
-      display:grid; gap:12px;
-      grid-template-columns:repeat(6, minmax(0,1fr));
-      margin-bottom:14px;
-    }
-    @media (max-width:1100px){ .grid{grid-template-columns:repeat(3,1fr)} }
-    @media (max-width:600px){ .grid{grid-template-columns:repeat(2,1fr)} }
-    .kpi{padding:14px}
-    .kpi .label{color:var(--muted);font-size:12px;margin-bottom:6px}
-    .kpi .value{font-size:18px;font-weight:700;letter-spacing:.2px}
-    .kpi .sub{color:var(--muted);font-size:12px;margin-top:6px}
-    .table{overflow:auto}
+    .tab.active{background:rgba(124,92,255,.25);border-color:rgba(124,92,255,.5)}
+
+    .grid{display:grid;gap:12px;grid-template-columns:repeat(6,1fr)}
+    @media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:600px){.grid{grid-template-columns:repeat(2,1fr)}}
+
+    .card{background:linear-gradient(180deg,var(--panel2),var(--panel));
+      border:1px solid var(--border);border-radius:var(--r);padding:14px}
+
     table{width:100%;border-collapse:separate;border-spacing:0}
-    th,td{padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.08);vertical-align:top}
-    th{position:sticky;top:0;background:rgba(11,18,32,.9);backdrop-filter:blur(10px);text-align:left;font-size:12px;color:var(--muted)}
+    th,td{padding:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+    th{font-size:12px;color:var(--muted);text-align:left;position:sticky;top:0;background:rgba(11,18,32,.9)}
     td{font-size:13px}
-    .name{font-weight:650}
-    .muted{color:var(--muted)}
-    .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;
-      padding:5px 9px;border-radius:999px;border:1px solid var(--border);
-      background:rgba(255,255,255,.04); color:var(--text);
-    }
     .right{text-align:right}
     .small{font-size:12px}
-    .footer{margin-top:14px;color:var(--muted);font-size:12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
-    .status{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .dot{width:9px;height:9px;border-radius:999px;background:rgba(45,212,191,.9);box-shadow:0 0 0 4px rgba(45,212,191,.18)}
-    .dot.bad{background:rgba(255,77,109,.95);box-shadow:0 0 0 4px rgba(255,77,109,.18)}
-    .spinner{
-      width:14px;height:14px;border-radius:50%;
-      border:2px solid rgba(255,255,255,.25);
-      border-top-color: rgba(255,255,255,.85);
-      animation:spin .8s linear infinite;
-      display:inline-block;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .err{
-      margin:12px 0;
-      padding:12px 14px;
-      border:1px solid rgba(255,77,109,.35);
-      background:rgba(255,77,109,.08);
-      border-radius:14px;
-      color:rgba(255,255,255,.9);
-      font-size:13px;
-      white-space:pre-wrap;
-    }
+    .badge{padding:4px 8px;border-radius:999px;border:1px solid var(--border);font-size:12px}
+    .muted{color:var(--muted)}
   </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <header>
-      <div class="hgroup">
-        <h1>Metrostav – report FB kampaní</h1>
-        <p>
-          Data z Meta Ads API (level=campaign). Divize se čte z názvu kampaně podle vzoru
-          <span class="badge">(D6)</span> ⇒ Divize 6. Bez závorky ⇒ <span class="badge">Nezařazeno</span>.
-        </p>
-      </div>
+<div class="wrap">
 
-      <div class="controls">
-        <div class="pill period-pill">
-          Období:
-          <select id="period">
-            <option value="7d">7 dní</option>
-            <option value="30d" selected>30 dní</option>
-            <option value="90d">90 dní</option>
-            <option value="180d">180 dní</option>
-<option value="365d">365 dní</option>
-          </select>
-        </div>
-
-        <div class="pill">
-          Hledat:
-          <input id="q" placeholder="část názvu kampaně…" />
-        </div>
-
-        <button class="btn" id="refreshBtn">Obnovit</button>
-      </div>
-    </header>
-
-    <div id="tabs" class="tabs"></div>
-
-    <div id="error" class="err" style="display:none"></div>
-
-    <div class="grid" id="kpis"></div>
-
-    <div class="card table">
-      <table>
-        <thead>
-          <tr>
-            <th>Kampaň</th>
-            <th>Od</th>
-            <th>Do</th>
-            <th>Divize</th>
-            <th class="right">Spend</th>
-            <th class="right">Impr.</th>
-            <th class="right">Clicks</th>
-            <th class="right">Reach</th>
-            <th class="right">CTR</th>
-            <th class="right">CPC</th>
-            <th class="right">Results</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-
-    <div class="footer">
-      <div class="status">
-        <span id="healthDot" class="dot" title="API status"></span>
-        <span id="statusText" class="muted">Připraveno</span>
-        <span id="loading" style="display:none" class="spinner" title="Načítám…"></span>
-      </div>
-      <div class="muted">
-        Endpoint: <code>/api/campaigns?division=…&period=…</code>
-      </div>
-    </div>
+<header>
+  <div class="hgroup">
+    <h1>Metrostav – report FB kampaní</h1>
+    <p>Divize se čte z názvu kampaně <span class="badge">(D6)</span>. Kampaně bez divize se nezobrazují.</p>
   </div>
 
+  <div class="controls">
+    <div class="pill period-pill">
+      Období:
+      <select id="period">
+        <option value="7d">7 dní</option>
+        <option value="30d" selected>30 dní</option>
+        <option value="90d">90 dní</option>
+        <option value="180d">180 dní</option>
+        <option value="365d">365 dní</option>
+      </select>
+    </div>
+
+    <div class="pill">Od: <input id="since" type="date"></div>
+    <div class="pill">Do: <input id="until" type="date"></div>
+
+    <div class="pill">Hledat: <input id="q" placeholder="název kampaně…"></div>
+    <button class="btn" id="refreshBtn">Obnovit</button>
+  </div>
+</header>
+
+<div id="tabs" class="tabs"></div>
+
+<div class="grid" id="kpis"></div>
+
+<div class="card">
+<table>
+<thead>
+<tr>
+  <th>Kampaň</th>
+  <th>Od</th>
+  <th>Do</th>
+  <th>Divize</th>
+  <th class="right">Spend</th>
+  <th class="right">Impr.</th>
+  <th class="right">Clicks</th>
+  <th class="right">Reach</th>
+  <th class="right">CTR</th>
+  <th class="right">CPC</th>
+  <th class="right">Results</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+
+</div>
+
 <script>
-  // ---- helpers ----
-  const fmtCZK = (n) => new Intl.NumberFormat("cs-CZ", { style:"currency", currency:"CZK", maximumFractionDigits:0 }).format(n || 0);
-  const fmtInt = (n) => new Intl.NumberFormat("cs-CZ").format(n || 0);
-  const pct = (n) => `${(Math.round((n||0)*100)/100).toLocaleString("cs-CZ")} %`;
-  const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtCZK=n=>new Intl.NumberFormat("cs-CZ",{style:"currency",currency:"CZK",maximumFractionDigits:0}).format(n||0);
+const fmtInt=n=>new Intl.NumberFormat("cs-CZ").format(n||0);
+const pct=n=>`${(n||0).toFixed(2)} %`;
 
-  function fmtDate(d){
-    if (!d) return "—";
-    return d; // YYYY-MM-DD
-  }
+const state={
+  period:new URLSearchParams(location.search).get("period")||"30d",
+  division:new URLSearchParams(location.search).get("division")||"D6",
+  q:new URLSearchParams(location.search).get("q")||"",
+  since:new URLSearchParams(location.search).get("since")||"",
+  until:new URLSearchParams(location.search).get("until")||"",
+};
 
-  function getParam(name, fallback=""){
-    const u = new URL(location.href);
-    return u.searchParams.get(name) ?? fallback;
-  }
-  function setParam(name, value){
-    const u = new URL(location.href);
-    if (value === "" || value == null) u.searchParams.delete(name);
-    else u.searchParams.set(name, value);
-    history.replaceState(null, "", u.toString());
-  }
+period.value=state.period;
+q.value=state.q;
+since.value=state.since;
+until.value=state.until;
 
-function getDivisions(rows){
-  const set = new Set(rows.map(r => r.division));
-  const nums = [...set]
-    .filter(d => /^D\d+$/i.test(d))
-    .sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
-  return ["Vše", ...nums]; // ✅ Nezařazeno už nikdy nepřidáváme
+function setParam(k,v){
+  const u=new URL(location.href);
+  v?u.searchParams.set(k,v):u.searchParams.delete(k);
+  history.replaceState(null,"",u);
 }
 
-  function showError(msg){
-    const el = document.getElementById("error");
-    if (!msg){ el.style.display="none"; el.textContent=""; return; }
-    el.style.display="block";
-    el.textContent = msg;
+async function fetchCampaigns(){
+  let url=`/api/campaigns?division=${state.division}`;
+  if(state.since&&state.until){
+    url+=`&since=${state.since}&until=${state.until}`;
+  }else{
+    url+=`&period=${state.period}`;
   }
+  return fetch(url,{cache:"no-store"}).then(r=>r.json());
+}
 
-  function setHealth(ok){
-    const dot = document.getElementById("healthDot");
-    dot.classList.toggle("bad", !ok);
-  }
-
-  function setStatus(text, loading=false){
-    document.getElementById("statusText").textContent = text;
-    document.getElementById("loading").style.display = loading ? "inline-block" : "none";
-  }
-
-  // ---- state ----
-  const state = {
-    period: getParam("period", "30d"),
-    division: getParam("division", "D6") || "D6",
-    q: getParam("q", ""),
-    raw: null,
-    rows: []
-  };
-
-  document.getElementById("period").value = state.period;
-  document.getElementById("q").value = state.q;
-
-  document.getElementById("period").addEventListener("change", (e)=>{
-    state.period = e.target.value;
-    setParam("period", state.period);
-    loadAndRender();
-  });
-
-  document.getElementById("q").addEventListener("input", (e)=>{
-    state.q = e.target.value.trim();
-    setParam("q", state.q);
-    render(); // jen klientský filtr bez fetch
-  });
-
-  document.getElementById("refreshBtn").addEventListener("click", ()=>{
-    loadAndRender(true);
-  });
-
-  async function fetchCampaigns(division, period){
-    const url = `/api/campaigns?division=${encodeURIComponent(division)}&period=${encodeURIComponent(period)}`;
-    const res = await fetch(url, { cache: "no-store" });
-    const data = await res.json().catch(()=>null);
-    if (!res.ok) {
-      const msg = data ? JSON.stringify(data, null, 2) : `HTTP ${res.status}`;
-      throw new Error(msg);
-    }
-    return data;
-  }
-
-  function tabLabel(div) {
-    if (div === "Vše") return "Vše";
-    if (div === "Nezařazeno") return "Nezařazeno";
-    const m = String(div).match(/^D(\d+)$/i);
-    return m ? `Divize ${m[1]}` : div;
-  }
-
-  function renderTabs(allRows){
-    const tabsEl = document.getElementById("tabs");
-    tabsEl.innerHTML = "";
-
-    const divisions = getDivisions(allRows);
-
-    // fallback pokud není v datech
-    if (!divisions.includes(state.division)) {
-      state.division = divisions.includes("D6") ? "D6" : "Vše";
-      setParam("division", state.division);
-    }
-
-    divisions.forEach(div => {
-      const b = document.createElement("button");
-      b.className = "tab" + (div === state.division ? " active" : "");
-      b.textContent = tabLabel(div);
-
-      // ✅ důležité: po kliknutí znovu načíst data
-      b.onclick = () => {
-        state.division = div;
-        setParam("division", div);
-        loadAndRender();
-      };
-
-      tabsEl.appendChild(b);
+function renderTabs(rows){
+  tabs.innerHTML="";
+  [...new Set(rows.map(r=>r.division))]
+    .filter(d=>/^D\d+$/.test(d))
+    .sort((a,b)=>+a.slice(1)-+b.slice(1))
+    .forEach(d=>{
+      const b=document.createElement("button");
+      b.className="tab"+(d===state.division?" active":"");
+      b.textContent=`Divize ${d.slice(1)}`;
+      b.onclick=()=>{state.division=d;setParam("division",d);load()};
+      tabs.appendChild(b);
     });
-  }
+}
 
-  function renderKpisFrom(kpi){
-    const items = [
-      { label:"Spend", value: fmtCZK(kpi.spend), sub:`Za ${state.period.replace("d","")} dní` },
-      { label:"Impressions", value: fmtInt(kpi.impressions), sub:"Zobrazení" },
-      { label:"Clicks", value: fmtInt(kpi.clicks), sub:"Kliknutí" },
-      { label:"Reach", value: fmtInt(kpi.reach), sub:"Dosah" },
-      { label:"CTR", value: pct(kpi.ctr), sub:"Clicks / Impr." },
-      { label:"CPC", value: fmtCZK(kpi.cpc), sub:"Spend / Clicks" },
-      { label:"Results", value: fmtInt(kpi.results), sub:"Zjednodušeně z actions" },
-    ];
+function renderTable(rows){
+  tbody.innerHTML="";
+  rows.filter(r=>r.division!=="Nezařazeno")
+      .filter(r=>r.campaign_name.toLowerCase().includes(state.q.toLowerCase()))
+      .forEach(r=>{
+        tbody.insertAdjacentHTML("beforeend",`
+          <tr>
+            <td>${r.campaign_name}</td>
+            <td class="small">${r.date_start||"—"}</td>
+            <td class="small">${r.date_stop||"—"}</td>
+            <td><span class="badge">${r.division}</span></td>
+            <td class="right">${fmtCZK(r.spend)}</td>
+            <td class="right">${fmtInt(r.impressions)}</td>
+            <td class="right">${fmtInt(r.clicks)}</td>
+            <td class="right">${fmtInt(r.reach)}</td>
+            <td class="right">${pct(r.ctr)}</td>
+            <td class="right">${fmtCZK(r.cpc)}</td>
+            <td class="right">${fmtInt(r.results)}</td>
+          </tr>`);
+      });
+}
 
-    const el = document.getElementById("kpis");
-    el.innerHTML = "";
-    items.forEach(it=>{
-      const c = document.createElement("div");
-      c.className = "card kpi";
-      c.innerHTML = `<div class="label">${it.label}</div><div class="value">${it.value}</div><div class="sub">${it.sub}</div>`;
-      el.appendChild(c);
-    });
-  }
+async function load(){
+  const all=await fetch(`/api/campaigns?division=Vše&period=${state.period}`).then(r=>r.json());
+  renderTabs(all.campaigns||[]);
+  const data=await fetchCampaigns();
+  renderTable(data.campaigns||[]);
+}
 
-  function renderTable(rows){
-    const q = state.q.toLowerCase();
-    const base = rows.filter(r => r.division !== "Nezařazeno"); // ✅ skryj kampaně bez (D…)
-const filtered = q
-  ? base.filter(r => (r.campaign_name||"").toLowerCase().includes(q))
-  : base;
+period.onchange=e=>{state.period=e.target.value;setParam("period",state.period);load()};
+since.onchange=e=>{state.since=e.target.value;setParam("since",state.since);load()};
+until.onchange=e=>{state.until=e.target.value;setParam("until",state.until);load()};
+q.oninput=e=>{state.q=e.target.value;setParam("q",state.q);renderTable(window._rows||[])};
+refreshBtn.onclick=()=>load();
 
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
-
-    filtered.forEach(r=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>
-          <div class="name">${escapeHtml(r.campaign_name)}</div>
-          <div class="muted small">ID: ${escapeHtml(r.campaign_id)}</div>
-        </td>
-        <td class="small">${fmtDate(r.date_start)}</td>
-        <td class="small">${fmtDate(r.date_stop)}</td>
-        <td><span class="badge">${escapeHtml(r.division)}</span></td>
-        <td class="right">${fmtCZK(r.spend)}</td>
-        <td class="right">${fmtInt(r.impressions)}</td>
-        <td class="right">${fmtInt(r.clicks)}</td>
-        <td class="right">${fmtInt(r.reach)}</td>
-        <td class="right">${pct(r.ctr)}</td>
-        <td class="right">${fmtCZK(r.cpc)}</td>
-        <td class="right">${fmtInt(r.results)}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    setStatus(`Zobrazeno ${filtered.length} kampaní (${state.division}, ${state.period})`, false);
-  }
-
-  // render using current state.raw
-  function render(){
-    if (!state.raw) return;
-    showError("");
-    setHealth(true);
-    renderTable(state.rows);
-  }
-
-  // load data
-  async function loadAndRender(force=false){
-    showError("");
-    setStatus("Načítám data z Meta…", true);
-
-    try {
-      // 1) kvůli tabům si stáhni "Vše" (cache v JS)
-      if (!state._allCache || force || state._allCachePeriod !== state.period) {
-        const all = await fetchCampaigns("Vše", state.period);
-        state._allCache = all;
-        state._allCachePeriod = state.period;
-        renderTabs(all.campaigns || []);
-      } else {
-        renderTabs(state._allCache.campaigns || []);
-      }
-
-      // 2) data pro vybranou divizi
-      const data = await fetchCampaigns(state.division, state.period);
-      state.raw = data;
-      state.rows = (data.campaigns || []).slice().sort((a,b)=> (b.spend||0)-(a.spend||0));
-
-      renderKpisFrom(data.kpi || {spend:0,impressions:0,clicks:0,reach:0,ctr:0,cpc:0,results:0});
-      renderTable(state.rows);
-
-    } catch (e) {
-      setHealth(false);
-      setStatus("Chyba při načítání", false);
-      showError(String(e && e.message ? e.message : e));
-      document.getElementById("kpis").innerHTML = "";
-      document.getElementById("tbody").innerHTML = "";
-    } finally {
-      document.getElementById("loading").style.display = "none";
-    }
-  }
-
-  // init
-  loadAndRender();
+load();
 </script>
+
 </body>
 </html>
