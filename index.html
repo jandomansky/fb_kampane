@@ -156,7 +156,9 @@
         <thead>
           <tr>
             <th>Kampaň</th>
-            <th>Divize</th>
+<th>Od</th>
+<th>Do</th>
+<th>Divize</th>
             <th class="right">Spend</th>
             <th class="right">Impr.</th>
             <th class="right">Clicks</th>
@@ -324,10 +326,16 @@ divisions.forEach(div => {
     filtered.forEach(r=>{
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>
-          <div class="name">${escapeHtml(r.campaign_name)}</div>
-          <div class="muted small">ID: ${escapeHtml(r.campaign_id)}</div>
-        </td>
+       tr.innerHTML = `
+  <td>
+    <div class="name">${escapeHtml(r.campaign_name)}</div>
+    <div class="muted small">ID: ${escapeHtml(r.campaign_id)}</div>
+  </td>
+  <td class="small">${fmtDate(r.date_start)}</td>
+  <td class="small">${fmtDate(r.date_stop)}</td>
+  <td><span class="badge">${escapeHtml(r.division)}</span></td>
+  ...
+`;
         <td><span class="badge">${escapeHtml(r.division)}</span></td>
         <td class="right">${fmtCZK(r.spend)}</td>
         <td class="right">${fmtInt(r.impressions)}</td>
