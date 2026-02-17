@@ -60,7 +60,7 @@ export async function onRequestGet({ request, env }) {
   const insightsUrl =
     `https://graph.facebook.com/v20.0/${accountId}/insights` +
     `?level=campaign` +
-    `&fields=campaign_id,campaign_name,spend,impressions,clicks,reach,ctr,cpc,actions` +
+    `&fields=campaign_id,campaign_name,date_start,date_stop,spend,impressions,clicks,reach,ctr,cpc,actions` +
     `&date_preset=${period.date_preset}` +
     `&limit=${limit}` +
     `&access_token=${encodeURIComponent(token)}`;
@@ -99,6 +99,8 @@ export async function onRequestGet({ request, env }) {
       cpc,
       results,
       actions, // pro debug / pozdější detail
+      date_start: r.date_start || null,
+date_stop:  r.date_stop  || null,
     };
   });
 
