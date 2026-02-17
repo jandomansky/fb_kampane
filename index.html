@@ -190,7 +190,11 @@
   const fmtInt = (n) => new Intl.NumberFormat("cs-CZ").format(n || 0);
   const pct = (n) => `${(Math.round((n||0)*100)/100).toLocaleString("cs-CZ")} %`;
   const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
+function fmtDate(d){
+  if (!d) return "—";
+  // Meta vrací YYYY-MM-DD, tohle jen zobrazí; kdybys chtěl česky, řekni a upravím
+  return d;
+}
   function getParam(name, fallback=""){
     const u = new URL(location.href);
     return u.searchParams.get(name) ?? fallback;
@@ -316,40 +320,36 @@ divisions.forEach(div => {
     });
   }
 
-  function renderTable(rows){
-    const q = state.q.toLowerCase();
-    const filtered = q ? rows.filter(r => (r.campaign_name||"").toLowerCase().includes(q)) : rows;
+ function renderTable(rows){
+  const q = state.q.toLowerCase();
+  const filtered = q ? rows.filter(r => (r.campaign_name||"").toLowerCase().includes(q)) : rows;
 
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
 
-    filtered.forEach(r=>{
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-       tr.innerHTML = `
-  <td>
-    <div class="name">${escapeHtml(r.campaign_name)}</div>
-    <div class="muted small">ID: ${escapeHtml(r.campaign_id)}</div>
-  </td>
-  <td class="small">${fmtDate(r.date_start)}</td>
-  <td class="small">${fmtDate(r.date_stop)}</td>
-  <td><span class="badge">${escapeHtml(r.division)}</span></td>
-  ...
-`;
-        <td><span class="badge">${escapeHtml(r.division)}</span></td>
-        <td class="right">${fmtCZK(r.spend)}</td>
-        <td class="right">${fmtInt(r.impressions)}</td>
-        <td class="right">${fmtInt(r.clicks)}</td>
-        <td class="right">${fmtInt(r.reach)}</td>
-        <td class="right">${pct(r.ctr)}</td>
-        <td class="right">${fmtCZK(r.cpc)}</td>
-        <td class="right">${fmtInt(r.results)}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+  filtered.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>
+        <div class="name">${escapeHtml(r.campaign_name)}</div>
+        <div class="muted small">ID: ${escapeHtml(r.campaign_id)}</div>
+      </td>
+      <td class="small">${fmtDate(r.date_start)}</td>
+      <td class="small">${fmtDate(r.date_stop)}</td>
+      <td><span class="badge">${escapeHtml(r.division)}</span></td>
+      <td class="right">${fmtCZK(r.spend)}</td>
+      <td class="right">${fmtInt(r.impressions)}</td>
+      <td class="right">${fmtInt(r.clicks)}</td>
+      <td class="right">${fmtInt(r.reach)}</td>
+      <td class="right">${pct(r.ctr)}</td>
+      <td class="right">${fmtCZK(r.cpc)}</td>
+      <td class="right">${fmtInt(r.results)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 
-    setStatus(`Zobrazeno ${filtered.length} kampaní (${state.division}, ${state.period})`, false);
-  }
+  setStatus(`Zobrazeno ${filtered.length} kampaní (${state.division}, ${state.period})`, false);
+}
 
   // render using current state.raw
   function render(){
