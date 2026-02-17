@@ -22,6 +22,8 @@ function normalizePeriod(p) {
   const v = String(p || "").toLowerCase().trim();
   if (v === "7" || v === "7d") return { days: 7, date_preset: "last_7d" };
   if (v === "90" || v === "90d") return { days: 90, date_preset: "last_90d" };
+  if (v === "180" || v === "180d") return { days: 180, date_preset: "last_180d" };
+if (v === "365" || v === "365d" || v === "1y") return { days: 365, date_preset: "last_365d" };
   return { days: 30, date_preset: "last_30d" };
 }
 
