@@ -275,18 +275,22 @@
       state.division = divisions.includes("D6") ? "D6" : "Vše";
       setParam("division", state.division);
     }
-
-    divisions.forEach(div=>{
-      const b = document.createElement("button");
-      b.className = "tab" + (div === state.division ? " active" : "");
-      b.textContent = div;
-      b.onclick = () => {
-        state.division = div;
-        setParam("division", div);
-        loadAndRender(); // pro změnu divize fetchneme server-side filtr (rychlé a jednoduché)
-      };
-      tabsEl.appendChild(b);
-    });
+function tabLabel(div) {
+  if (div === "Vše") return "Vše";
+  if (div === "Nezařazeno") return "Nezařazeno";
+  const m = String(div).match(/^D(\d+)$/i);
+  return m ? `Divize ${m[1]}` : div;
+}
+divisions.forEach(div => {
+  const b = document.createElement("button");
+  b.className = "tab" + (div === state.division ? " active" : "");
+  b.textContent = tabLabel(div);   // 👈 tady je změna
+  b.onclick = () => {
+    state.division = div;          // hodnota pro API zůstává D1, D3…
+    render();
+  };
+  tabsEl.appendChild(b);
+});
   }
 
   function renderKpisFrom(kpi){
