@@ -46,10 +46,21 @@
 
     .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
     .tab{
-      border:1px solid var(--border);background:rgba(255,255,255,.04);
-      border-radius:999px;padding:9px 12px;font-size:13px;cursor:pointer
-    }
-    .tab.active{background:rgba(124,92,255,.25);border-color:rgba(124,92,255,.5)}
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.04);
+  color: rgba(255,255,255,.78); /* 👈 světlejší než teď */
+  border-radius:999px;
+  padding:9px 12px;
+  font-size:13px;
+  cursor:pointer;
+  user-select:none;
+}
+    .tab.active{
+  background:rgba(124,92,255,.28);
+  border-color:rgba(124,92,255,.55);
+  color:#fff; /* 👈 čistě bílá */
+  box-shadow:0 10px 26px rgba(124,92,255,.22);
+}
 
     .grid{display:grid;gap:12px;grid-template-columns:repeat(6,1fr)}
     @media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
