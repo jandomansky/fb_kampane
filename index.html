@@ -211,13 +211,13 @@
     history.replaceState(null, "", u.toString());
   }
 
-  function getDivisions(rows){
-    const set = new Set(rows.map(r => r.division));
-    const nums = [...set].filter(d => /^D\d+$/i.test(d)).sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
-    const ordered = ["Vše", ...nums];
-    if (set.has("Nezařazeno")) ordered.push("Nezařazeno");
-    return ordered;
-  }
+function getDivisions(rows){
+  const set = new Set(rows.map(r => r.division));
+  const nums = [...set]
+    .filter(d => /^D\d+$/i.test(d))
+    .sort((a,b)=>parseInt(a.slice(1))-parseInt(b.slice(1)));
+  return ["Vše", ...nums]; // ✅ Nezařazeno už nikdy nepřidáváme
+}
 
   function showError(msg){
     const el = document.getElementById("error");
@@ -333,7 +333,10 @@
 
   function renderTable(rows){
     const q = state.q.toLowerCase();
-    const filtered = q ? rows.filter(r => (r.campaign_name||"").toLowerCase().includes(q)) : rows;
+    const base = rows.filter(r => r.division !== "Nezařazeno"); // ✅ skryj kampaně bez (D…)
+const filtered = q
+  ? base.filter(r => (r.campaign_name||"").toLowerCase().includes(q))
+  : base;
 
     const tbody = document.getElementById("tbody");
     tbody.innerHTML = "";
