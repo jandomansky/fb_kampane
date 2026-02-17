@@ -23,7 +23,7 @@ function normalizePeriod(p) {
   if (v === "7" || v === "7d") return { days: 7, date_preset: "last_7d" };
   if (v === "90" || v === "90d") return { days: 90, date_preset: "last_90d" };
   if (v === "180" || v === "180d") return { days: 180, date_preset: "last_180d" };
-if (v === "365" || v === "365d" || v === "1y") return { days: 365, date_preset: "last_365d" };
+  if (v === "365" || v === "365d" || v === "1y") return { days: 365, date_preset: "last_365d" };
   return { days: 30, date_preset: "last_30d" };
 }
 
@@ -44,6 +44,11 @@ function pickResult(actions) {
   return first ? num(first.value) : 0;
 }
 
+function isISODate(d) {
+  // YYYY-MM-DD
+  return typeof d === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d);
+}
+
 export async function onRequestGet({ request, env }) {
   const token = env.META_ACCESS_TOKEN;
   const id = env.META_AD_ACCOUNT_ID;
@@ -56,14 +61,33 @@ export async function onRequestGet({ request, env }) {
   const period = normalizePeriod(urlIn.searchParams.get("period"));
   const limit = Math.min(Math.max(parseInt(urlIn.searchParams.get("limit") || "100", 10), 1), 500);
 
+  // ✅ volitelný kalendářní rozsah
+  const since = urlIn.searchParams.get("since");
+  const until = urlIn.searchParams.get("until");
+  const hasRange = !!(since && until);
+
+  if ((since && !until) || (!since && until)) {
+    return json({ ok: false, error: "Provide both 'since' and 'until' (YYYY-MM-DD)." }, 400);
+  }
+  if (hasRange && (!isISODate(since) || !isISODate(until))) {
+    return json({ ok: false, error: "Invalid date format. Use YYYY-MM-DD for 'since' and 'until'." }, 400);
+  }
+
   const accountId = id.startsWith("act_") ? id : `act_${id}`;
+
+  // ✅ buď preset, nebo time_range
+  let timePart = `date_preset=${encodeURIComponent(period.date_preset)}`;
+  if (hasRange) {
+    const tr = JSON.stringify({ since, until });
+    timePart = `time_range=${encodeURIComponent(tr)}`;
+  }
 
   // Insights: vrací rovnou metriky na úrovni campaign
   const insightsUrl =
     `https://graph.facebook.com/v20.0/${accountId}/insights` +
     `?level=campaign` +
     `&fields=campaign_id,campaign_name,date_start,date_stop,spend,impressions,clicks,reach,ctr,cpc,actions` +
-    `&date_preset=${period.date_preset}` +
+    `&${timePart}` +
     `&limit=${limit}` +
     `&access_token=${encodeURIComponent(token)}`;
 
@@ -102,7 +126,7 @@ export async function onRequestGet({ request, env }) {
       results,
       actions, // pro debug / pozdější detail
       date_start: r.date_start || null,
-date_stop:  r.date_stop  || null,
+      date_stop: r.date_stop || null,
     };
   });
 
@@ -126,7 +150,7 @@ date_stop:  r.date_stop  || null,
   return json({
     ok: true,
     accountId,
-    period,
+    period: hasRange ? { mode: "range", since, until } : period,
     division,
     kpi: { ...sum, ctr: aggCtr, cpc: aggCpc },
     campaigns: filtered.sort((a, b) => b.spend - a.spend),
